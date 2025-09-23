@@ -190,7 +190,7 @@ function generateWinningImage (data, timing) {
   </svg>`
 
   return {
-    src: 'data:image/svg+xml;base64,' + btoa(svg),
+    src: 'data:image/svg+xml;base64,' + btoa(svg.replace(/\n\s+/g, '')),
     alt: `${text} ${time} on ${title}`
   }
 }
