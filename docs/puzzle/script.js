@@ -30,7 +30,9 @@ function createSvg (board) {
   const $svg = createSvgElement('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
     'xmlns:xlink': 'http://www.w3.org/1999/xlink',
-    viewBox: `${-frameSize} ${-frameSize} ${width} ${height}`
+    viewBox: `${-frameSize} ${-frameSize} ${width} ${height}`,
+    width,
+    height
   })
 
   const $cells = createSvgElement('g', { class: 'cells' })
@@ -206,11 +208,7 @@ async function main () {
   // Load interface
   document.getElementById('title').textContent = formatDate(data.publicationDate)
   document.getElementById('byline').textContent = `By ${formatList(data.constructors)}, edited by ${data.editor}`
-  const $svg = createSvg(board)
-  const dimensions = $svg.getAttribute('viewBox').split(' ')
-  $svg.setAttribute('width', (dimensions[2] - dimensions[0]) + 'px')
-  $svg.setAttribute('height', (dimensions[3] - dimensions[1]) + 'px')
-  document.getElementById('crossword-board').append($svg)
+  document.getElementById('crossword-board').append(createSvg(board))
 
   for (const $cell of document.querySelectorAll('g[data-index]')) {
     board.cells[$cell.dataset.index].$g = $cell

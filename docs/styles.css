@@ -2,6 +2,7 @@ body {
   font-family: system-ui, sans-serif;
   margin: 0 auto;
   max-width: 800px;
+  padding: 0 1em;
 }
 
 form input {
@@ -23,12 +24,18 @@ button {
 
 #crossword-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 2em;
-/*   margin: 0 calc((100% - max(100%, 80vw)) / 2); */
-/*   width: max(100%, 80vw); */
+  justify-content: center;
 }
 
-#crossword-container > div {
+#crossword-board svg {
+  max-height: fit-content; /* ??? */
+  max-width: 100%;
+}
+
+#clues {
+  flex: 1 1 250px;
 }
 
 #clues h3 {
