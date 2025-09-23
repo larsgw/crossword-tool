@@ -163,7 +163,7 @@ async function main () {
   const params = new URLSearchParams(document.location.search)
   const url = params.get('url')
 
-  const data = await fetch(`/proxy?url=${encodeURIComponent(url)}`).then(response => response.json())
+  const data = await fetch(url).then(response => response.json())
   const board = data.body[0]
 
   // Load interface
