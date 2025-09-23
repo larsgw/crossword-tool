@@ -12,14 +12,17 @@
       <h1>Crossword Tool</h1>
 
       <p>Tool to display crosswords in a standard JSON format.</p>
-      <form action="puzzle.html" method="get">
+      <form id="form">
         <p>
-          <label for="url">Crossword JSON URL</label><br>
-          <input id="url" name="url" type="url"></input>
+          <label for="file">Crossword JSON file</label><br>
+          <input id="file" name="file" type="file"></input>
         </p>
 
-        <button>Display</button>
+        <button>Upload</button>
       </form>
     </main>
+
+    <script src="db.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>
