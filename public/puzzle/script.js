@@ -330,7 +330,7 @@ async function main () {
     applyFocus(focus, board)
   })
 
-  function handleClick (event) {
+  function handleCellClick (event) {
     const $g = event.target.closest('g[data-index]')
     const cell = parseInt($g.dataset.index)
     if (cell === focus.cell) {
@@ -346,7 +346,21 @@ async function main () {
   }
 
   for (const cell of board.cells) {
-    cell.$g.addEventListener('click', handleClick)
+    cell.$g.addEventListener('click', handleCellClick)
+  }
+
+  function handleClueClick (event) {
+    const index = parseInt(event.target.dataset.clue)
+    const clue = board.clues[index]
+    if (!clue.cells.includes(focus.cell) || clue.direction !== focus.direction) {
+      focus.cell = clue.cells[0]
+      focus.direction = clue.direction
+    }
+    applyFocus(focus, board)
+  }
+
+  for (const clue of board.clues) {
+    clue.$li.addEventListener('click', handleClueClick)
   }
 
   document.getElementById('dialog_start').addEventListener('close', function () {
