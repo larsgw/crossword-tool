@@ -78,10 +78,10 @@ button {
   pointer-events: bounding-box;
 }
 
-#crossword-board .cells > g.active path {
+#crossword-board .cells > g.active rect {
   fill: #FAE8C7;
 }
 
-#crossword-board .cells > g.focus path {
+#crossword-board .cells > g.focus rect {
   fill: #FDAA45;
 }

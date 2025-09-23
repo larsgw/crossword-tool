@@ -7,7 +7,6 @@ window.addEventListener('load', function () {
       editor: data.editor,
       publicationDate: data.publicationDate,
       body: [{
-        board: data.body[0].board,
         cells: data.body[0].cells,
         clues: data.body[0].clues,
         clueLists: data.body[0].clueLists,

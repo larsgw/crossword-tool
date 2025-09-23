@@ -13,40 +13,76 @@ function formatList (list) {
   }
 }
 
-function isAttributeClean (name, value) {
-  const normalizedValue = value.replace(/\s+/g, '').toLowerCase()
-  if (['src', 'href', 'xlink:href'].includes(name) && value.match(/javascript:|data:text\/html/)) {
-    return false
-  } else if (name.startsWith('on')) {
-    return false
-  } else {
-    return true
+function createSvgElement (tag, attributes) {
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag)
+  for (const key in attributes) {
+    element.setAttribute(key, attributes[key])
   }
+  return element
 }
 
-function sanitizeElement (element) {
-  for (const { name, value } of element.attributes) {
-    if (!isAttributeClean(name, value)) {
-      element.attributes.remove(name)
+function createSvg (board) {
+  const cellSize = 100
+  const frameSize = 3
+  const width = board.dimensions.width * cellSize + 2 * frameSize
+  const height = board.dimensions.height * cellSize + 2 * frameSize
+
+  const $svg = createSvgElement('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+    viewBox: `${-frameSize} ${-frameSize} ${width} ${height}`
+  })
+
+  const $cells = createSvgElement('g', { class: 'cells' })
+  for (let i = 0; i < board.cells.length; i++) {
+    const x = i % board.dimensions.width
+    const y = (i - x) / board.dimensions.width
+    const $g = createSvgElement('g', { 'data-index': i })
+    const $rect = createSvgElement('rect', {
+      x: x * cellSize,
+      y: y * cellSize,
+      width: cellSize,
+      height: cellSize,
+      fill: board.cells[i].type === 1 ? 'none' : '#000000',
+      stroke: '#666666'
+    })
+    $g.appendChild($rect)
+
+    if (board.cells[i].label) {
+      const $text = createSvgElement('text', {
+        x: x * cellSize + 4,
+        y: y * cellSize + 28,
+        'font-size': 28
+      })
+      $text.textContent = board.cells[i].label
+      $g.appendChild($text)
     }
+
+    const $text = createSvgElement('text', {
+      class: 'guess',
+      x: x * cellSize + 0.5 * cellSize,
+      y: y * cellSize + cellSize - 18,
+      'font-size': 72,
+      'text-anchor': 'middle'
+    })
+    $g.appendChild($text)
+
+    $cells.appendChild($g)
   }
+  $svg.appendChild($cells)
 
-  for (const child of element.children) {
-    sanitizeElement(child)
-  }
-}
+  const $frame = createSvgElement('rect', {
+    x: -0.5 * frameSize,
+    y: -0.5 * frameSize,
+    width: board.dimensions.width * cellSize + frameSize,
+    height: board.dimensions.height * cellSize + frameSize,
+    fill: 'none',
+    stroke: 'black',
+    'stroke-width': frameSize
+  })
+  $svg.appendChild($frame)
 
-function sanitizeSvg (svg) {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(svg, 'text/html')
-
-  for (const script of doc.querySelectorAll('script')) {
-    script.remove()
-  }
-
-  sanitizeElement(doc.body)
-
-  return doc.body.children[0]
+  return $svg
 }
 
 function getFocus (focus, board) {
@@ -170,7 +206,7 @@ async function main () {
   // Load interface
   document.getElementById('title').textContent = formatDate(data.publicationDate)
   document.getElementById('byline').textContent = `By ${formatList(data.constructors)}, edited by ${data.editor}`
-  const $svg = sanitizeSvg(board.board)
+  const $svg = createSvg(board)
   const dimensions = $svg.getAttribute('viewBox').split(' ')
   $svg.setAttribute('width', (dimensions[2] - dimensions[0]) + 'px')
   $svg.setAttribute('height', (dimensions[3] - dimensions[1]) + 'px')
