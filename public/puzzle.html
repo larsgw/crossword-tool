@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Crossword Tool</title>
+
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main id="crossword">
+      <h1 id="title"></h1>
+      <p id="byline"></p>
+
+      <p id="timer">0:00</p>
+      <div id="crossword-container">
+        <div id="crossword-board"></div>
+        <div id="clues"></div>
+      </div>
+    </main>
+
+    <dialog id="dialog_start">
+      <h2>Fill in the crossword!</h2>
+
+      <form method="dialog">
+        <button>Start</button>
+      </form>
+    </dialog>
+
+    <dialog id="dialog_finish">
+      <h2>Well done!</h2>
+
+      <p>
+        <img id="dialog_finish_image" width="300"/>
+        <button id="dialog_finish_share">Share</button>
+      </p>
+
+      <form method="dialog">
+        <button>Close</button>
+      </form>
+    </dialog>
+
+    <dialog id="dialog_incorrect">
+      <h2>Close!</h2>
+
+      <form method="dialog">
+        <button>Continue</button>
+      </form>
+    </dialog>
+
+    <script src="script.js"></script>
+  </body>
+</html>

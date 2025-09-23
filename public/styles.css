@@ -1,0 +1,87 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+form input {
+  width: 100%;
+}
+
+button {
+  background: black;
+  border: 0;
+  border-radius: 0.5em;
+  color: white;
+  font-weight: bold;
+  padding: 0.5em 0.75em;
+}
+
+#timer {
+  text-align: center;
+}
+
+#crossword-container {
+  display: flex;
+  gap: 2em;
+/*   margin: 0 calc((100% - max(100%, 80vw)) / 2); */
+/*   width: max(100%, 80vw); */
+}
+
+#crossword-container > div {
+}
+
+#clues h3 {
+  margin: 0;
+}
+
+#clues ul {
+  list-style-type: none;
+  margin: 0 0 1em 0;
+  padding: 0 0 0 2em;
+}
+
+#clues li {
+  padding: 0.25em 0;
+  position: relative;
+}
+
+#clues li.complete {
+  color: #666666;
+  text-decoration: line-through;
+}
+
+#clues li.active, #clues li.active:before {
+  background-color: #FAE8C7;
+}
+
+#clues li:before {
+  bottom: 0;
+  content: '';
+  display: block;
+  position: absolute;
+  right: 100%;
+  top: 0;
+  width: 2em;
+  z-index: -1;
+}
+
+#clues li::marker {
+  content: attr(data-label) ". ";
+}
+
+#crossword-board svg {
+  user-select: none;
+}
+
+#crossword-board .cells > g {
+  pointer-events: bounding-box;
+}
+
+#crossword-board .cells > g.active path {
+  fill: #FAE8C7;
+}
+
+#crossword-board .cells > g.focus path {
+  fill: #FDAA45;
+}
