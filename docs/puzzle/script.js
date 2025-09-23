@@ -63,7 +63,7 @@ function createSvg (board) {
     const $text = createSvgElement('text', {
       class: 'guess',
       x: x * cellSize + 0.5 * cellSize,
-      y: y * cellSize + cellSize - 18,
+      y: y * cellSize + cellSize - 12,
       'font-size': 72,
       'text-anchor': 'middle'
     })
