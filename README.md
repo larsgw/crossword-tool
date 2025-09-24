@@ -19,7 +19,7 @@ Crossword files are expected as JSON files with the following format:
 | Property | Type | Description |
 |----------|------|-------------|
 |`cells`   |[`array<CrosswordCell>`](#crossword-cell)|List of cells|
-|`clues`   |[`array<CrosswordClue>](#crossword-clue)|List of clues|
+|`clues`   |[`array<CrosswordClue>`](#crossword-clue)|List of clues|
 |`clueLists`|[`array<CrosswordClueList>`](#crossword-clue-list)|List of clue lists (e.g. "across" and "down")|
 |`dimensions`|`object`|Object with integer properties `width` and `height` specifying the dimensions of the board in number of cells|
 
@@ -35,9 +35,16 @@ Crossword files are expected as JSON files with the following format:
 | Property | Type | Description |
 |----------|------|-------------|
 |`label`   |`string`|Short label for the clue (usually numeric)|
-|`type`    |`number`|`0` for black cells, `1` for white cells|
-|`answer`  |`string`|Letter to be filled in the cell|
-|`clues`   |`array<number>`|List of numbers corresponding to clue indices|
+|`direction`|`string`|`"Across"` or `"Down"`|
+|`text`|[`array<CrosswordClueText>`](#crossword-clue-text)|Single-item list containing the clue text|
+|`cells`   |`array<number>`|List of numbers corresponding to cell indices|
+|`relatives`|`array<number>`|Optionally, a list of numbers corresponding to indices of related clues|
+
+### Crossword clue text
+
+| Property | Type | Description |
+|----------|------|-------------|
+|`plain`   |`string`|Plain text|
 
 ### Crossword cell
 
