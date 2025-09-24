@@ -21,6 +21,33 @@ function createSvgElement (tag, attributes) {
   return element
 }
 
+function createKeyboard () {
+  const fragment = new DocumentFragment()
+  const keys = ['QWERTYUIOP', 'ASDFGHJKL', [...' ZXCVBNM', 'Backspace']]
+
+  for (const row of keys) {
+    const $row = document.createElement('div')
+    fragment.appendChild($row)
+
+    for (const key of row) {
+      const $key = document.createElement('div')
+      $row.appendChild($key)
+
+      if (key === ' ') {
+        $key.classList.add('key')
+        $key.textContent = '\u00A0'
+        continue
+      }
+
+      $key.classList.add('key')
+      $key.dataset.key = key
+      $key.textContent = key === 'Backspace' ? '\u232B' : key
+    }
+  }
+
+  return fragment
+}
+
 function createSvg (board) {
   const cellSize = 100
   const frameSize = 3
@@ -90,8 +117,8 @@ function createSvg (board) {
 function getFocus (focus, board) {
   const cell = board.cells[focus.cell]
   const clue = cell.clues
-  .map(clue => board.clues[clue])
-  .find(clue => clue.direction === focus.direction)
+    .map(clue => board.clues[clue])
+    .find(clue => clue.direction === focus.direction)
 
   return { cell, clue }
 }
@@ -130,6 +157,23 @@ function moveFocus (focus, board, { forward, loop, checkGuesses }) {
   focus.cell = clue.cells[i]
 }
 
+function moveClueFocus (focus, board, { forward, checkGuesses }) {
+  const { cell, clue } = getFocus(focus, board)
+  const i = board.clues.indexOf(clue)
+
+  const nextClue = board.clues[((forward ? i + 1 : i - 1) + board.clues.length) % board.clues.length]
+  if (checkGuesses && isCluePartiallyComplete(nextClue, board)) {
+    return
+  }
+
+  focus.cell = nextClue.cells[0]
+  focus.direction = nextClue.direction
+}
+
+function isCluePartiallyComplete (clue, board) {
+  return clue.cells.some(cell => board.guesses[cell] !== null)
+}
+
 function isClueComplete (clue, board) {
   return clue.cells.every(cell => board.guesses[cell] !== null)
 }
@@ -162,7 +206,7 @@ function generateWinningImage (data, timing) {
   const time = duration < 60 ? `${duration} seconds` : formatTime(duration)
   const title = formatDate(data.publicationDate)
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300 150" width="1200px" height="600px" style="font-family: Cambria, serif;">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300 150" width="400px" height="200px" style="font-family: Cambria, serif;">
     <rect x="0" y="0" width="300" height="150" fill="#FAE8C7"/>
 
     <rect x="270" y="0" width="30" height="30" fill="#FDAA45"/>
@@ -206,6 +250,8 @@ async function main () {
   const board = data.body[0]
 
   // Load interface
+  document.getElementById('keyboard').append(createKeyboard())
+
   document.getElementById('title').textContent = formatDate(data.publicationDate)
   document.getElementById('byline').textContent = `By ${formatList(data.constructors)}, edited by ${data.editor}`
   document.getElementById('crossword-board').append(createSvg(board))
@@ -242,12 +288,12 @@ async function main () {
   let filled = false
 
   // Event listeners
-  window.addEventListener('keydown', function (event) {
+  function handleKey (key) {
     if (!document.querySelector('g[data-index].focus')) {
       return
     }
 
-    if (event.key === 'Backspace') {
+    if (key === 'Backspace') {
       board.guesses[focus.cell] = null
       board.cells[focus.cell].$g.querySelector('.guess').textContent = ''
       for (const clue of board.cells[focus.cell].clues) {
@@ -255,24 +301,24 @@ async function main () {
       }
       filled = false
       moveFocus(focus, board, { forward: false, loop: false, checkGuesses: false })
-    } else if (event.key === 'Enter') {
+    } else if (key === 'Enter') {
       const { clue } = getFocus(focus, board)
       const i = board.clues.indexOf(clue)
       const nextClue = board.clues[(i + 1) % board.clues.length]
       focus.cell = nextClue.cells[0]
       focus.direction = nextClue.direction
-    } else if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && focus.direction === DIRECTIONS.ACROSS) {
+    } else if ((key === 'ArrowDown' || key === 'ArrowUp') && focus.direction === DIRECTIONS.ACROSS) {
       focus.direction = DIRECTIONS.DOWN
-    } else if ((event.key === 'ArrowRight' || event.key === 'ArrowLeft') && focus.direction === DIRECTIONS.DOWN) {
+    } else if ((key === 'ArrowRight' || key === 'ArrowLeft') && focus.direction === DIRECTIONS.DOWN) {
       focus.direction = DIRECTIONS.ACROSS
-    } else if (event.key.startsWith('Arrow')) {
+    } else if (key.startsWith('Arrow')) {
       moveFocus(focus, board, {
-        forward: event.key === 'ArrowDown' || event.key === 'ArrowRight',
+        forward: key === 'ArrowDown' || key === 'ArrowRight',
         loop: true,
         checkGuesses: false
       })
-    } else if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && !timing.endTime) {
-      const guess = event.key.toUpperCase()
+    } else if (key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && !timing.endTime) {
+      const guess = key.toUpperCase()
       board.guesses[focus.cell] = guess
       board.cells[focus.cell].$g.querySelector('.guess').textContent = guess
 
@@ -320,13 +366,29 @@ async function main () {
       }
 
       const { clue } = getFocus(focus, board)
-      if (!isClueComplete(clue, board)) {
+      if (isClueComplete(clue, board)) {
+        moveClueFocus(focus, board, { forward: true, checkGuesses: true })
+      } else {
         moveFocus(focus, board, { forward: true, loop: true, checkGuesses: true })
       }
     }
 
     applyFocus(focus, board)
+  }
+
+  window.addEventListener('keydown', function (event) {
+    handleKey(event.key)
   })
+
+  function handleMobileKey (event) {
+    if (event.target.dataset.key) {
+      handleKey(event.target.dataset.key)
+    }
+  }
+
+  for (const $key of document.querySelectorAll('#keyboard .key')) {
+    $key.addEventListener('click', handleMobileKey)
+  }
 
   function handleCellClick (event) {
     const $g = event.target.closest('g[data-index]')
@@ -360,6 +422,16 @@ async function main () {
   for (const clue of board.clues) {
     clue.$li.addEventListener('click', handleClueClick)
   }
+
+  document.getElementById('mobile-clues-prev').addEventListener('click', function () {
+    moveClueFocus(focus, board, { forward: false })
+    applyFocus(focus, board)
+  })
+
+  document.getElementById('mobile-clues-next').addEventListener('click', function () {
+    moveClueFocus(focus, board, { forward: true })
+    applyFocus(focus, board)
+  })
 
   document.getElementById('dialog_start').addEventListener('close', function () {
     timing.startTime = Date.now()

@@ -103,3 +103,77 @@ button {
 #crossword-board .cells > g.focus rect {
   fill: #FDAA45;
 }
+
+#mobile-controls {
+  background-color: #eeeeee;
+  bottom: 0;
+  display: none;
+  left: 0;
+  padding: 0.5em 0.5em 1em;
+  position: fixed;
+  right: 0;
+}
+
+#mobile-clues {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5em;
+}
+
+#mobile-clues > div {
+  background-color: #333333;
+  border-radius: 4px;
+  color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+  width: 1.4em;
+  text-align: center;
+}
+
+#keyboard {
+  display: flex;
+  flex-flow: column;
+  gap: 0.25em;
+}
+
+#keyboard > div {
+  display: flex;
+  gap: 0.25em;
+}
+
+#keyboard .key[data-key] {
+  background-color: lightgrey;
+  border-radius: 4px;
+}
+
+#keyboard .key {
+  flex: 1 1;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 3em;
+  text-align: center;
+}
+
+#dialog_finish img {
+  max-width: 100%;
+}
+
+@media screen and (width <= 500px) {
+  h1 {
+    font-size: 1.25em;
+    margin-bottom: 0.4em;
+  }
+
+  #clues h3,
+  #clues li:not(.active) {
+    display: none;
+  }
+
+  #crossword-container {
+    padding: 0 1em;
+  }
+
+  #mobile-controls {
+    display: block;
+  }
+}
