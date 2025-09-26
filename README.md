@@ -44,6 +44,7 @@ Crossword files are expected as JSON files with the following format:
 
 | Property | Type | Description |
 |----------|------|-------------|
+|`formatted`|`string`|HTML|
 |`plain`   |`string`|Plain text|
 
 ### Crossword cell

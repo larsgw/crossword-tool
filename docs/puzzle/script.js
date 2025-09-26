@@ -268,7 +268,15 @@ async function main () {
     for (const clueIndex of list.clues) {
       const clue = board.clues[clueIndex]
       const $li = document.createElement('li')
-      $li.textContent = `${clue.text.map(item => item.plain).join(' ')}`
+      for (const item of clue.text) {
+        const $span = document.createElement('span')
+        if (item.formatted) {
+          $span.innerHTML = item.formatted
+        } else {
+          $span.textContent = item.plain
+        }
+        $li.appendChild($span)
+      }
       $li.setAttribute('data-clue', clueIndex)
       $li.setAttribute('data-label', clue.label)
       $ul.appendChild($li)
