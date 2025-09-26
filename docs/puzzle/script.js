@@ -13,6 +13,42 @@ function formatList (list) {
   }
 }
 
+function isAttributeClean (name, value) {
+  const normalizedValue = value.replace(/\s+/g, '').toLowerCase()
+  if (['src', 'href', 'xlink:href'].includes(name) && value.match(/javascript:|data:text\/html/)) {
+    return false
+  } else if (name.startsWith('on')) {
+    return false
+  } else {
+    return true
+  }
+}
+
+function sanitizeElement (element) {
+  for (const { name, value } of element.attributes) {
+    if (!isAttributeClean(name, value)) {
+      element.attributes.remove(name)
+    }
+  }
+
+  for (const child of element.children) {
+    sanitizeElement(child)
+  }
+}
+
+function sanitizeHtml (svg) {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svg, 'text/html')
+
+  for (const script of doc.querySelectorAll('script')) {
+    script.remove()
+  }
+
+  sanitizeElement(doc.body)
+
+  return doc.body.innerHTML
+}
+
 function createSvgElement (tag, attributes) {
   const element = document.createElementNS('http://www.w3.org/2000/svg', tag)
   for (const key in attributes) {
@@ -271,7 +307,7 @@ async function main () {
       for (const item of clue.text) {
         const $span = document.createElement('span')
         if (item.formatted) {
-          $span.innerHTML = item.formatted
+          $span.innerHTML = sanitizeHtml(item.formatted)
         } else {
           $span.textContent = item.plain
         }
