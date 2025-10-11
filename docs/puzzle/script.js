@@ -15,7 +15,7 @@ function formatList (list) {
 
 function isAttributeClean (name, value) {
   const normalizedValue = value.replace(/\s+/g, '').toLowerCase()
-  if (['src', 'href', 'xlink:href'].includes(name) && value.match(/javascript:|data:text\/html/)) {
+  if (['src', 'href', 'xlink:href'].includes(name) && normalizedValue.match(/javascript:|data:text\/html/)) {
     return false
   } else if (name.startsWith('on')) {
     return false
