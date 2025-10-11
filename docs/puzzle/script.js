@@ -289,7 +289,7 @@ async function main () {
   document.getElementById('keyboard').append(createKeyboard())
 
   document.getElementById('title').textContent = formatDate(data.publicationDate)
-  document.getElementById('byline').textContent = `By ${formatList(data.constructors)}, edited by ${data.editor}`
+  document.getElementById('byline').textContent = `By ${formatList(data.constructors)}` + (data.editor ? `, edited by ${data.editor}` : '')
   document.getElementById('crossword-board').append(createSvg(board))
 
   for (const $cell of document.querySelectorAll('g[data-index]')) {

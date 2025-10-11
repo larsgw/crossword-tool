@@ -10,7 +10,7 @@ Crossword files are expected as JSON files with the following format:
 |----------|------|-------------|
 |`id`      |`string`|Unique ID|
 |`constructors`|`array<string>`|List of name(s) of crossword constructor(s)|
-|`editor`  |`string`|Name of crossword editor|
+|`editor`  |`string`|If different, name of crossword editor|
 |`publicationDate`|`string`|Crossword publication date (`YYYY-MM-DD`)|
 |`body`    |[`array<CrosswordBody>`](#crossword-body)|Single-item list containing the specific crossword|
 
