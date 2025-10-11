@@ -26,6 +26,19 @@ button {
   text-align: center;
 }
 
+#pause {
+  color: #666666;
+  cursor: pointer;
+}
+
+#pause:hover {
+  color: inherit;
+}
+
+#dialog_resume::backdrop {
+  background-color: #ffffff;
+}
+
 #byline {
   margin-top: 0;
 }

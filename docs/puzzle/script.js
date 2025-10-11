@@ -237,7 +237,7 @@ function formatTime (duration) {
 }
 
 function generateWinningImage (data, timing) {
-  const duration = Math.floor((timing.endTime - timing.startTime) / 1000)
+  const duration = Math.floor(timing.duration / 1000)
   const text = 'I finished this crossword in'
   const time = duration < 60 ? `${duration} seconds` : formatTime(duration)
   const title = formatDate(data.publicationDate)
@@ -324,28 +324,36 @@ async function main () {
 
   // Setup game state
   board.guesses = Array(board.cells.length).fill(null)
-  const timing = {}
+  const timing = { duration: 0 }
   const focus = {
     cell: board.clues[0].cells[0],
     direction: board.clues[0].direction
   }
+  let done = false
   let filled = false
 
   // Event listeners
+  function startTimer () {
+    timing.startTime = Date.now()
+    timing.timer = setInterval(function () {
+      const duration = Math.floor((timing.duration + Date.now() - timing.startTime) / 1000)
+      document.getElementById('timer').textContent = formatTime(duration)
+    }, 1000)
+  }
+
+  function stopTimer () {
+    const endTime = Date.now()
+    clearInterval(timing.timer)
+    timing.duration += endTime - timing.startTime
+    delete timing.startTime
+  }
+
   function handleKey (event) {
     if (!document.querySelector('g[data-index].focus')) {
       return
     }
 
-    if (event.key === 'Backspace') {
-      board.guesses[focus.cell] = null
-      board.cells[focus.cell].$g.querySelector('.guess').textContent = ''
-      for (const clue of board.cells[focus.cell].clues) {
-        board.clues[clue].$li.classList.remove('complete')
-      }
-      filled = false
-      moveFocus(focus, board, { forward: false, loop: false, checkGuesses: false })
-    } else if (event.key === 'Enter') {
+    if (event.key === 'Enter') {
       const { clue } = getFocus(focus, board)
       const i = board.clues.indexOf(clue)
       const nextClue = board.clues[(i + 1) % board.clues.length]
@@ -361,7 +369,17 @@ async function main () {
         loop: true,
         checkGuesses: false
       })
-    } else if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && !timing.endTime) {
+    } else if (done) {
+      return
+    } else if (event.key === 'Backspace') {
+      board.guesses[focus.cell] = null
+      board.cells[focus.cell].$g.querySelector('.guess').textContent = ''
+      for (const clue of board.cells[focus.cell].clues) {
+        board.clues[clue].$li.classList.remove('complete')
+      }
+      filled = false
+      moveFocus(focus, board, { forward: false, loop: false, checkGuesses: false })
+    } else if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
       const guess = event.key.toUpperCase()
       board.guesses[focus.cell] = guess
       board.cells[focus.cell].$g.querySelector('.guess').textContent = guess
@@ -373,8 +391,9 @@ async function main () {
       }
 
       if (isPuzzleCorrect(board)) {
-        timing.endTime = Date.now()
-        clearInterval(timing.timer)
+        stopTimer()
+        done = true
+
         const $img = document.getElementById('dialog_finish_image')
         const image = generateWinningImage(data, timing)
         $img.setAttribute('src', image.src)
@@ -477,13 +496,17 @@ async function main () {
     applyFocus(focus, board)
   })
 
-  document.getElementById('dialog_start').addEventListener('close', function () {
-    timing.startTime = Date.now()
-    timing.timer = setInterval(function () {
-      const duration = Math.floor((Date.now() - timing.startTime) / 1000)
-      document.getElementById('timer').textContent = formatTime(duration)
-    }, 1000)
+  document.getElementById('pause').addEventListener('click', function () {
+    stopTimer()
+    document.getElementById('dialog_resume').showModal()
+  })
 
+  document.getElementById('dialog_resume').addEventListener('close', function () {
+    startTimer()
+  })
+
+  document.getElementById('dialog_start').addEventListener('close', function () {
+    startTimer()
     applyFocus(focus, board)
   })
 

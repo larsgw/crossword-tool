@@ -13,7 +13,10 @@
       <h1 id="title"></h1>
       <p id="byline"></p>
 
-      <p id="timer">0:00</p>
+      <p>
+        <span id="timer">0:00</span>
+        <span id="pause">&#x23F8;</span>
+      </p>
       <div id="crossword-container">
         <div id="crossword-board"></div>
         <div id="clues"></div>
@@ -33,6 +36,14 @@
 
       <form method="dialog">
         <button>Start</button>
+      </form>
+    </dialog>
+
+    <dialog id="dialog_resume">
+      <h2>Paused</h2>
+
+      <form method="dialog">
+        <button>Resume</button>
       </form>
     </dialog>
 
