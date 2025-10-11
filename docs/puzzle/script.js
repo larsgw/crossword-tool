@@ -332,12 +332,12 @@ async function main () {
   let filled = false
 
   // Event listeners
-  function handleKey (key) {
+  function handleKey (event) {
     if (!document.querySelector('g[data-index].focus')) {
       return
     }
 
-    if (key === 'Backspace') {
+    if (event.key === 'Backspace') {
       board.guesses[focus.cell] = null
       board.cells[focus.cell].$g.querySelector('.guess').textContent = ''
       for (const clue of board.cells[focus.cell].clues) {
@@ -345,24 +345,24 @@ async function main () {
       }
       filled = false
       moveFocus(focus, board, { forward: false, loop: false, checkGuesses: false })
-    } else if (key === 'Enter') {
+    } else if (event.key === 'Enter') {
       const { clue } = getFocus(focus, board)
       const i = board.clues.indexOf(clue)
       const nextClue = board.clues[(i + 1) % board.clues.length]
       focus.cell = nextClue.cells[0]
       focus.direction = nextClue.direction
-    } else if ((key === 'ArrowDown' || key === 'ArrowUp') && focus.direction === DIRECTIONS.ACROSS) {
+    } else if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && focus.direction === DIRECTIONS.ACROSS) {
       focus.direction = DIRECTIONS.DOWN
-    } else if ((key === 'ArrowRight' || key === 'ArrowLeft') && focus.direction === DIRECTIONS.DOWN) {
+    } else if ((event.key === 'ArrowRight' || event.key === 'ArrowLeft') && focus.direction === DIRECTIONS.DOWN) {
       focus.direction = DIRECTIONS.ACROSS
-    } else if (key.startsWith('Arrow')) {
+    } else if (event.key.startsWith('Arrow')) {
       moveFocus(focus, board, {
-        forward: key === 'ArrowDown' || key === 'ArrowRight',
+        forward: event.key === 'ArrowDown' || event.key === 'ArrowRight',
         loop: true,
         checkGuesses: false
       })
-    } else if (key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && !timing.endTime) {
-      const guess = key.toUpperCase()
+    } else if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey && !timing.endTime) {
+      const guess = event.key.toUpperCase()
       board.guesses[focus.cell] = guess
       board.cells[focus.cell].$g.querySelector('.guess').textContent = guess
 
@@ -421,12 +421,12 @@ async function main () {
   }
 
   window.addEventListener('keydown', function (event) {
-    handleKey(event.key)
+    handleKey(event)
   })
 
   function handleMobileKey (event) {
     if (event.target.dataset.key) {
-      handleKey(event.target.dataset.key)
+      handleKey({ key: event.target.dataset.key })
     }
   }
 
