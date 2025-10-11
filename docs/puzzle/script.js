@@ -280,8 +280,8 @@ function generateWinningImage (data, timing) {
 async function main () {
   const params = new URLSearchParams(document.location.search)
   const id = params.get('id')
-  const store = (await db).transaction(['crosswords'], 'readwrite').objectStore('crosswords')
-  const data = (await p(store.get(id))).target.result
+  const crosswords = (await db).transaction(['crosswords'], 'readonly').objectStore('crosswords')
+  const data = (await p(crosswords.get(id))).target.result
 
   const board = data.body[0]
 
@@ -393,6 +393,15 @@ async function main () {
       if (isPuzzleCorrect(board)) {
         stopTimer()
         done = true
+
+        db.then(db => {
+          const scores = db.transaction(['scores'], 'readwrite').objectStore('scores')
+          return p(scores.put({
+            id: data.id,
+            duration: timing.duration,
+            timestamp: Date.now(),
+          }))
+        }).catch(error => alert(`Failed saving score: "${error.message}"`))
 
         const $img = document.getElementById('dialog_finish_image')
         const image = generateWinningImage(data, timing)
